@@ -156,7 +156,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import toast, { Toaster } from 'react-hot-toast';
 
 // import { Toaster } from 'react-hot-toast';
-import useGlobalContextProvider from '../ContextApi';
+import { useGlobalContextProvider } from '../context/ContextApi';
 import { useRouter } from 'next/navigation';
 
 function DropDown() {

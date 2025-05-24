@@ -83,44 +83,131 @@
 
 // export default Navbar;
 
+// ------------------
+
+// 'use client';
+// import React, { useState } from 'react';
+// import Image from 'next/image';
+// import useGlobalContextProvider from '../ContextApi';
+
+// function Navbar() {
+//   const { userObject } = useGlobalContextProvider();
+//   const { user, setUser } = userObject;
+//   const [isLoading, setIsLoading] = useState(false);
+
+//   // Toggle login state
+//   async function changeTheLoginState() {
+//     const userCopy = { ...user };
+//     userCopy.isLogged = !userCopy.isLogged;
+
+//     try {
+//       setIsLoading(true);
+//       const response = await fetch(
+//         `http://localhost:3000/api/user?id=${userCopy._id}`,
+//         {
+//           method: 'PUT',
+//           headers: { 'Content-Type': 'application/json' },
+//           body: JSON.stringify({ updateUser: userCopy }),
+//         },
+//       );
+
+//       if (!response.ok) {
+//         console.error('Error updating user:', response.statusText);
+//         throw new Error('Failed to update user.');
+//       }
+
+//       setUser(userCopy);
+//     } catch (error) {
+//       console.error('Error:', error);
+//     } finally {
+//       setIsLoading(false);
+//     }
+//   }
+
+//   return (
+//     <nav className="bg-white shadow-md fixed top-0 left-0 w-full z-50 mb-6">
+//       <div className="flex items-center justify-between max-w-screen-xl mx-auto p-4 sm:px-8 sm:py-3">
+//         <a href="/" className="flex items-center gap-2">
+//           <Image
+//             src="/quizSpark_icon.png"
+//             alt="Quiz Spark Logo"
+//             width={40}
+//             height={40}
+//             className="rounded-full"
+//           />
+//           <h2 className="text-xl font-bold">
+//             Quiz <span className="text-green-700">Spark</span>
+//           </h2>
+//         </a>
+//         <div className="flex items-center gap-4">
+//           {user.isLogged && (
+//             <div className="text-sm text-gray-700">
+//               <span>Welcome, <span className="font-semibold">{user.name}</span></span>
+//               <span className="ml-2 font-bold text-green-700">{user.experience} XP</span>
+//             </div>
+//           )}
+//           <button
+//             className={`rounded-lg px-4 py-2 text-sm font-medium text-white transition ${
+//               isLoading
+//                 ? 'bg-gray-500'
+//                 : 'bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-400'
+//             }`}
+//             type="button"
+//             disabled={isLoading}
+//             onClick={changeTheLoginState}
+//           >
+//             {isLoading ? 'Loading...' : user.isLogged ? 'Logout' : 'Login'}
+//           </button>
+//         </div>
+//       </div>
+//     </nav>
+//   );
+// }
+
+// export default Navbar;
+
+
+// app/components/Navbar.js
+// app/components/Navbar.js
 'use client';
 import React, { useState } from 'react';
 import Image from 'next/image';
-import useGlobalContextProvider from '../ContextApi';
+import { useRouter } from 'next/navigation';
+import { toast } from 'react-hot-toast';
+import { useGlobalContextProvider } from '../context/ContextApi';
 
 function Navbar() {
   const { userObject } = useGlobalContextProvider();
   const { user, setUser } = userObject;
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
-  // Toggle login state
-  async function changeTheLoginState() {
-    const userCopy = { ...user };
-    userCopy.isLogged = !userCopy.isLogged;
+  const handleLogout = async () => {
+    if (!user) return;
+    setIsLoading(true);
 
     try {
-      setIsLoading(true);
-      const response = await fetch(
-        `http://localhost:3000/api/user?id=${userCopy._id}`,
-        {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ updateUser: userCopy }),
-        },
-      );
+      const response = await fetch('/api/logout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: user._id }),
+      });
 
       if (!response.ok) {
-        console.error('Error updating user:', response.statusText);
-        throw new Error('Failed to update user.');
+        toast.error('Logout failed');
+        throw new Error('Logout failed');
       }
 
-      setUser(userCopy);
+      setUser(null); // Set user to null on logout
+      localStorage.removeItem('user'); // Ensure localStorage is cleared
+      router.push('/login');
     } catch (error) {
       console.error('Error:', error);
+      toast.error('Logout failed');
     } finally {
       setIsLoading(false);
     }
-  }
+  };
 
   return (
     <nav className="bg-white shadow-md fixed top-0 left-0 w-full z-50 mb-6">
@@ -138,24 +225,43 @@ function Navbar() {
           </h2>
         </a>
         <div className="flex items-center gap-4">
-          {user.isLogged && (
-            <div className="text-sm text-gray-700">
-              <span>Welcome, <span className="font-semibold">{user.name}</span></span>
-              <span className="ml-2 font-bold text-green-700">{user.experience} XP</span>
-            </div>
+          {user?.isLogged ? ( // Added null check
+            <>
+              <div className="text-sm text-gray-700">
+                <span>
+                  Welcome, <span className="font-semibold">{user.name}</span>
+                </span>
+                <span className="ml-2 font-bold text-green-700">{user.experience} XP</span>
+              </div>
+              <button
+                className={`rounded-lg px-4 py-2 text-sm font-medium text-white transition ${
+                  isLoading
+                    ? 'bg-gray-500'
+                    : 'bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-400'
+                }`}
+                type="button"
+                disabled={isLoading}
+                onClick={handleLogout}
+              >
+                {isLoading ? 'Logging out...' : 'Logout'}
+              </button>
+            </>
+          ) : (
+            <>
+              <a
+                href="/login"
+                className="text-sm font-medium text-green-700 hover:underline"
+              >
+                Login
+              </a>
+              <a
+                href="/register"
+                className="rounded-lg px-4 py-2 text-sm font-medium text-white bg-green-700 hover:bg-green-800"
+              >
+                Register
+              </a>
+            </>
           )}
-          <button
-            className={`rounded-lg px-4 py-2 text-sm font-medium text-white transition ${
-              isLoading
-                ? 'bg-gray-500'
-                : 'bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-400'
-            }`}
-            type="button"
-            disabled={isLoading}
-            onClick={changeTheLoginState}
-          >
-            {isLoading ? 'Loading...' : user.isLogged ? 'Logout' : 'Login'}
-          </button>
         </div>
       </div>
     </nav>

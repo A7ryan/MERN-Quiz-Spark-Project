@@ -2,7 +2,7 @@
 
 import React from 'react';
 import Image from 'next/image';
-import useGlobalContextProvider from '../ContextApi';
+import { useGlobalContextProvider } from '../context/ContextApi';
 import { useRouter } from 'next/navigation';
 function PlaceHolder(props) {
   const { userObject } = useGlobalContextProvider();

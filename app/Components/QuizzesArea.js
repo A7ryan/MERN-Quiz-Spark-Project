@@ -81,11 +81,12 @@
 
 
 
+// app/components/QuizzesArea.js
 'use client';
 import React from 'react';
 import QuizCard from './QuizCard';
 import PlaceHolder from './PlaceHolder';
-import useGlobalContextProvider from '../ContextApi';
+import { useGlobalContextProvider } from '../context/ContextApi';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import DropDown from './DropDown';
@@ -99,8 +100,8 @@ function QuizzesArea() {
   return (
     <div className="poppins mx-4 sm:mx-12 mt-8">
       {isLoading ? (
-        <div>Loading...</div>
-      ) : user.isLogged ? (
+        <div className="text-center text-gray-600">Loading...</div>
+      ) : user?.isLogged ? ( // Added null check with optional chaining
         <>
           {allQuizzes.length === 0 ? (
             <PlaceHolder />
@@ -114,7 +115,7 @@ function QuizzesArea() {
                 ))}
                 <div
                   onClick={() => router.push('/quiz-build')}
-                  className="flex flex-col items-center justify-center border rounded-md cursor-pointer p-4"
+                  className="flex flex-col items-center justify-center border rounded-md cursor-pointer p-4 hover:bg-gray-50 transition"
                 >
                   <Image
                     src="/add-quiz.png"
@@ -122,7 +123,7 @@ function QuizzesArea() {
                     height={160}
                     alt="Add Quiz"
                   />
-                  <span>Add a new Quiz</span>
+                  <span className="text-sm text-gray-600 mt-2">Add a new Quiz</span>
                 </div>
               </div>
             </div>
@@ -136,7 +137,7 @@ function QuizzesArea() {
           <p className="text-lg mt-2">Unlock Your Potential with Personalized Quizzes</p>
           <button
             onClick={() => router.push('/login')}
-            className="mt-4 px-6 py-2 bg-green-700 text-white rounded-lg"
+            className="mt-4 px-6 py-2 bg-green-700 text-white rounded-lg hover:bg-green-800 transition"
           >
             Get Started Now!
           </button>

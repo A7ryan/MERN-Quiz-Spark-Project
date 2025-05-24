@@ -1,7 +1,7 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
-import useGlobalContextProvider from '@/app/ContextApi';
+import { useGlobalContextProvider } from '@/app/context/ContextApi';
 import { v4 as uuidv4 } from 'uuid';
 import { faCode } from '@fortawesome/free-solid-svg-icons';
 

@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCode } from '@fortawesome/free-solid-svg-icons';
-import useGlobalContextProvider from '@/app/ContextApi';
+import { useGlobalContextProvider } from '@/app/context/ContextApi';
 import convertToFaIcons from '@/app/convertToFaIcons';
 
 function QuizBuildTitle({ focusProp, onChangeQuizTitle }) {

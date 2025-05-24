@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { iconsData } from '@/app/iconsData';
 import { faClose } from '@fortawesome/free-solid-svg-icons';
-import useGlobalContextProvider from '@/app/ContextApi';
+import { useGlobalContextProvider } from '@/app/context/ContextApi';
 
 function IconsComponents() {
   const [allIcons, setAllIcons] = useState(iconsData);

@@ -9,7 +9,7 @@ import {
   faQuestion,
 } from '@fortawesome/free-solid-svg-icons';
 import Link from 'next/link';
-import useGlobalContextProvider from '../ContextApi';
+import { useGlobalContextProvider } from '../context/ContextApi';
 import { icon } from '@fortawesome/fontawesome-svg-core';
 import convertToFaIcons from '../convertToFaIcons';
 

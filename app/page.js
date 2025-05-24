@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import Navbar from './Components/Navbar';
 import QuizzesArea from './Components/QuizzesArea';
-import useGlobalContextProvider from './ContextApi';
+import { useGlobalContextProvider } from './context/ContextApi';
 
 import toast, { Toaster } from 'react-hot-toast';
 export default function Home() {

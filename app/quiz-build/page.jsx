@@ -1,3 +1,4 @@
+// app/quiz-build/page.jsx
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -8,9 +9,9 @@ import { v4 as uuidv4 } from 'uuid';
 import { faCode } from '@fortawesome/free-solid-svg-icons';
 import { Toaster } from 'react-hot-toast';
 import IconsComponents from '../Components/QuizBuildPage/IconsComponents';
-import useGlobalContextProvider from '../ContextApi';
+import { useGlobalContextProvider } from '../context/ContextApi'; // Fixed import
 
-function Page(props) {
+function Page() {
   const prefixes = ['A', 'B', 'C', 'D'];
   const { selectedIconObject, selectedQuizObject } = useGlobalContextProvider();
   const { selectedIcon } = selectedIconObject;
@@ -51,8 +52,6 @@ function Page(props) {
     }
   });
 
-  console.log(newQuiz);
-
   useEffect(() => {
     setNewQuiz((prevQuiz) => ({
       ...prevQuiz,
@@ -83,7 +82,16 @@ function Page(props) {
   };
 
   return (
-    <div className=" relative mx-16 poppins">
+    <div className="relative mx-16 poppins">
+      <Toaster
+        toastOptions={{
+          className: '',
+          duration: 1500,
+          style: {
+            padding: '12px',
+          },
+        }}
+      />
       <IconsComponents />
       <QuizBuildNav {...quizNavBarProps} />
       <QuizBuildTitle {...quizTitleProps} />

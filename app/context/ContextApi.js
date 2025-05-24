@@ -1,99 +1,90 @@
+// app/context/ContextApi.js
 'use client';
-
 import { createContext, useContext, useEffect, useState } from 'react';
-import { quizzesData } from './QuizzesData';
 import { faQuestion } from '@fortawesome/free-solid-svg-icons';
-import toast from 'react-hot-toast';
+import { toast } from 'react-hot-toast';
 
 const GlobalContext = createContext();
 
-export function ContextProvider({ children }) {
+export function GlobalContextProvider({ children }) {
   const [allQuizzes, setAllQuizzes] = useState([]);
   const [selectQuizToStart, setSelectQuizToStart] = useState(null);
-  const [user, setUser] = useState({});
+  const [user, setUser] = useState(null); // Fixed: Initialize as null
   const [openIconBox, setOpenIconBox] = useState(false);
   const [selectedQuiz, setSelectedQuiz] = useState(null);
   const [selectedIcon, setSelectedIcon] = useState({ faIcon: faQuestion });
-
   const [dropDownToggle, setDropDownToggle] = useState(false);
   const [threeDotsPositions, setThreeDotsPositions] = useState({ x: 0, y: 0 });
   const [isLoading, setLoading] = useState(true);
-
   const [userXP, setUserXP] = useState(0);
 
+  // Fetch quizzes on mount
   useEffect(() => {
-    // Fetch all quizzes
     const fetchAllQuizzes = async () => {
       try {
         setLoading(true);
-        const response = await fetch('http://localhost:3000/api/quizzes', {
+        const response = await fetch('/api/quizzes', {
           cache: 'no-cache',
         });
 
         if (!response.ok) {
-          toast.error('Something went wrong...');
-          throw new Error('fetching failed...');
+          toast.error('Failed to fetch quizzes');
+          throw new Error('Fetching quizzes failed');
         }
 
         const quizzesData = await response.json();
-
         setAllQuizzes(quizzesData.quizzes);
       } catch (error) {
-        console.log(error);
+        console.error('Error fetching quizzes:', error);
       } finally {
         setLoading(false);
       }
     };
 
-    // Fetch the user
-
     fetchAllQuizzes();
   }, []);
 
+  // Load user from localStorage on mount
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const response = await fetch('http://localhost:3000/api/user', {
-          method: 'POST',
-          headers: {
-            'Content-type': 'application/json',
-          },
-          body: JSON.stringify({
-            name: 'quizUser',
-            isLogged: false,
-            experience: 0,
-          }),
-        });
-
-        if (!response.ok) {
-          toast.error('Something went wrong...');
-          throw new Error('fetching failed...');
-        }
-
-        const userData = await response.json();
-        console.log(userData);
-
-        if (userData.message === 'User already exists') {
-          // If user already exists, update the user state with the returned user
-          setUser(userData.user);
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+          const parsedUser = JSON.parse(storedUser);
+          setUser(parsedUser);
+          setUserXP(parsedUser.experience || 0);
         } else {
-          // If user doesn't exist, set the newly created user state
-          setUser(userData.user);
+          setUser(null); // Ensure user is null if no stored user
         }
       } catch (error) {
-        console.log(error);
+        console.error('Error loading user from localStorage:', error);
+        setUser(null); // Fallback to null on error
       }
     };
     fetchUser();
   }, []);
 
+  // Update localStorage when user changes
   useEffect(() => {
-    setUser((prevUser) => ({
-      ...prevUser,
-      experience: userXP,
-    }));
+    if (user) {
+      localStorage.setItem('user', JSON.stringify(user));
+    } else {
+      localStorage.removeItem('user');
+    }
+  }, [user]);
+
+  // Sync user.experience with userXP
+  useEffect(() => {
+    if (user) {
+      setUser((prevUser) => {
+        const updatedUser = { ...prevUser, experience: userXP };
+        localStorage.setItem('user', JSON.stringify(updatedUser));
+        return updatedUser;
+      });
+    }
   }, [userXP]);
 
+  // Update selected icon when selectedQuiz changes
   useEffect(() => {
     if (selectedQuiz) {
       setSelectedIcon({ faIcon: selectedQuiz.icon });
@@ -123,6 +114,6 @@ export function ContextProvider({ children }) {
   );
 }
 
-export default function useGlobalContextProvider() {
+export function useGlobalContextProvider() {
   return useContext(GlobalContext);
 }
